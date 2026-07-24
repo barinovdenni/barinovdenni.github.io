@@ -1,202 +1,594 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const cards = document.querySelectorAll(".project-card");
+/* =========================
+   БАЗОВЫЕ НАСТРОЙКИ
+========================= */
 
-    const modal = document.querySelector("#project-modal");
-    const modalImage = document.querySelector("#modal-image");
-    const modalTitle = document.querySelector("#modal-title");
-    const closeButton = document.querySelector(".modal-close");
-    const modalOverlay = document.querySelector("[data-close-modal]");
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    const cardRects = new WeakMap();
+html {
+    scroll-behavior: smooth;
+}
 
-    const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-    ).matches;
+body {
+    background: #111111;
+    color: #f5f5f5;
 
-    let previousFocusedElement = null;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+}
 
 
-    /* Возвращаем карточку в исходное положение */
+/* =========================
+   ШАПКА
+========================= */
 
-    function resetCard(card) {
-        card.style.transition = "transform 0.35s ease";
+.header {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 40px;
 
-        card.style.setProperty("--rotate-x", "0deg");
-        card.style.setProperty("--rotate-y", "0deg");
-        card.style.setProperty("--move-y", "0px");
-        card.style.setProperty("--card-scale", "1");
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-        card.style.zIndex = "1";
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
 
-        cardRects.delete(card);
+.navigation {
+    display: flex;
+    gap: 32px;
+}
+
+.navigation a {
+    position: relative;
+    color: #bcbcbc;
+
+    transition: color 0.3s ease;
+}
+
+.navigation a:hover {
+    color: #b9ff66;
+}
+
+.navigation a:focus-visible,
+.logo:focus-visible,
+.footer a:focus-visible {
+    outline: 2px solid #b9ff66;
+    outline-offset: 5px;
+    border-radius: 4px;
+}
+
+
+/* =========================
+   ГЛАВНЫЙ ЭКРАН
+========================= */
+
+.hero {
+    width: 100%;
+    max-width: 1200px;
+    min-height: 80vh;
+
+    margin: 0 auto;
+    padding: 120px 40px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.subtitle {
+    margin-bottom: 20px;
+
+    color: #b9ff66;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.hero h1 {
+    max-width: 950px;
+    margin-bottom: 28px;
+
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -3px;
+}
+
+.description {
+    max-width: 600px;
+    margin-bottom: 40px;
+
+    color: #bcbcbc;
+    font-size: 20px;
+}
+
+
+/* =========================
+   КНОПКА
+========================= */
+
+.button {
+    display: inline-block;
+    padding: 16px 28px;
+
+    background: #b9ff66;
+    color: #111111;
+
+    border-radius: 100px;
+    font-weight: 700;
+
+    transition:
+        transform 0.3s ease,
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.button:hover {
+    background: #d0ff99;
+
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 12px 30px rgba(185, 255, 102, 0.18);
+}
+
+.button:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 5px;
+}
+
+
+/* =========================
+   РАЗДЕЛЫ
+========================= */
+
+.about,
+.projects {
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+    padding: 100px 40px;
+}
+
+.about {
+    border-top: 1px solid #292929;
+}
+
+.about h2,
+.projects h2 {
+    margin-bottom: 36px;
+    font-size: 42px;
+}
+
+.about p {
+    max-width: 750px;
+
+    color: #bcbcbc;
+    font-size: 24px;
+}
+
+
+/* =========================
+   СЕТКА ПРОЕКТОВ
+========================= */
+
+.project-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px, 260px));
+
+    justify-content: center;
+    gap: 20px;
+}
+
+
+/* =========================
+   КАРТОЧКА ПРОЕКТА
+========================= */
+
+.project-card {
+    --rotate-x: 0deg;
+    --rotate-y: 0deg;
+    --move-y: 0px;
+    --card-scale: 1;
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+
+    position: relative;
+    isolation: isolate;
+
+    width: 100%;
+    padding: 14px;
+
+    background: #1b1b1b;
+
+    border: 1px solid #292929;
+    border-radius: 18px;
+
+    overflow: hidden;
+    cursor: pointer;
+
+    transform-origin: center;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform;
+
+    transform:
+        perspective(650px)
+        rotateX(var(--rotate-x))
+        rotateY(var(--rotate-y))
+        translateY(var(--move-y))
+        scale(var(--card-scale));
+
+    transition:
+        transform 0.12s linear,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.project-card:hover,
+.project-card:focus-visible {
+    border-color: #b9ff66;
+
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.45),
+        0 0 30px rgba(185, 255, 102, 0.08);
+}
+
+.project-card:focus-visible {
+    outline: 2px solid #b9ff66;
+    outline-offset: 5px;
+}
+
+
+/* Световой блик */
+
+.project-card::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    background: radial-gradient(
+        circle 180px at var(--mouse-x) var(--mouse-y),
+        rgba(185, 255, 102, 0.25),
+        transparent 65%
+    );
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity 0.3s ease;
+}
+
+.project-card:hover::before,
+.project-card:focus-visible::before {
+    opacity: 1;
+}
+
+
+/* Контент поверх блика */
+
+.project-card > * {
+    position: relative;
+    z-index: 3;
+}
+
+
+/* Изображение карточки */
+
+.project-card img {
+    display: block;
+
+    width: 100%;
+    height: 160px;
+    margin-bottom: 14px;
+
+    object-fit: cover;
+
+    border-radius: 12px;
+
+    transition: transform 0.4s ease;
+}
+
+.project-card:hover img,
+.project-card:focus-visible img {
+    transform: scale(1.04);
+}
+
+
+/* Текст карточки */
+
+.project-card span {
+    color: #b9ff66;
+    font-size: 14px;
+}
+
+.project-card h3 {
+    margin-top: 10px;
+    margin-bottom: 8px;
+
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.project-card p {
+    color: #a9a9a9;
+    font-size: 14px;
+}
+
+
+/* =========================
+   ПОДВАЛ
+========================= */
+
+.footer {
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+    padding: 40px;
+
+    border-top: 1px solid #333333;
+
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+
+    color: #888888;
+}
+
+.footer a {
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #b9ff66;
+}
+
+
+/* =========================
+   МОДАЛЬНОЕ ОКНО
+========================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+}
+
+.modal.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    position: relative;
+    z-index: 1;
+
+    width: min(900px, 100%);
+    max-height: 90vh;
+    padding: 18px;
+
+    background: #181818;
+
+    border: 1px solid #333333;
+    border-radius: 24px;
+
+    overflow-y: auto;
+
+    transform: scale(0.9) translateY(20px);
+
+    transition: transform 0.3s ease;
+}
+
+.modal.open .modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.modal-content img {
+    display: block;
+
+    width: 100%;
+    max-height: 70vh;
+
+    object-fit: contain;
+
+    border-radius: 16px;
+}
+
+.modal-content h3 {
+    margin-top: 18px;
+    padding-right: 55px;
+
+    font-size: 24px;
+}
+
+
+/* Кнопка закрытия */
+
+.modal-close {
+    position: absolute;
+    top: 28px;
+    right: 28px;
+    z-index: 2;
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(17, 17, 17, 0.8);
+    color: #ffffff;
+
+    border: 1px solid #555555;
+    border-radius: 50%;
+
+    font-size: 30px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+.modal-close:hover {
+    background: #b9ff66;
+    color: #111111;
+
+    transform: rotate(90deg);
+}
+
+.modal-close:focus-visible {
+    outline: 3px solid #b9ff66;
+    outline-offset: 4px;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+
+/* =========================
+   ТЕЛЕФОН
+========================= */
+
+@media (max-width: 700px) {
+    .header {
+        padding: 24px 20px;
     }
 
-
-    /* Открываем увеличенное изображение */
-
-    function openModal(card) {
-        if (!modal || !modalImage || !modalTitle) {
-            return;
-        }
-
-        const image = card.querySelector("img");
-        const title = card.querySelector("h3");
-
-        if (!image || !title) {
-            return;
-        }
-
-        previousFocusedElement = document.activeElement;
-
-        modalImage.src = image.currentSrc || image.src;
-        modalImage.alt = image.alt;
-        modalTitle.textContent = title.textContent.trim();
-
-        modal.classList.add("open");
-        modal.setAttribute("aria-hidden", "false");
-
-        document.body.classList.add("modal-open");
-
-        closeButton?.focus();
+    .navigation {
+        display: none;
     }
 
-
-    /* Закрываем увеличенное изображение */
-
-    function closeModal() {
-        if (!modal || !modal.classList.contains("open")) {
-            return;
-        }
-
-        modal.classList.remove("open");
-        modal.setAttribute("aria-hidden", "true");
-
-        document.body.classList.remove("modal-open");
-
-        modalImage?.removeAttribute("src");
-
-        if (previousFocusedElement instanceof HTMLElement) {
-            previousFocusedElement.focus();
-        }
+    .hero {
+        min-height: auto;
+        padding: 100px 20px;
     }
 
+    .hero h1 {
+        font-size: 48px;
+        letter-spacing: -2px;
+    }
 
-    /* Настраиваем карточки */
+    .description {
+        font-size: 18px;
+    }
 
-    cards.forEach((card) => {
-        const title = card.querySelector("h3");
+    .about,
+    .projects {
+        padding: 70px 20px;
+    }
 
-        card.tabIndex = 0;
-        card.setAttribute("role", "button");
+    .about h2,
+    .projects h2 {
+        font-size: 34px;
+    }
 
-        if (title) {
-            card.setAttribute(
-                "aria-label",
-                `Открыть проект: ${title.textContent.trim()}`
-            );
-        }
+    .about p {
+        font-size: 20px;
+    }
 
+    .project-grid {
+        grid-template-columns: minmax(220px, 280px);
+    }
 
-        /* Запоминаем исходное положение карточки */
+    .footer {
+        padding: 30px 20px;
 
-        card.addEventListener("pointerenter", () => {
-            cardRects.set(card, card.getBoundingClientRect());
-        });
+        flex-direction: column;
+        gap: 12px;
+    }
 
+    .modal {
+        padding: 14px;
+    }
 
-        /* Наклоняем карточку вслед за курсором */
+    .modal-content {
+        padding: 10px;
+        border-radius: 18px;
+    }
 
-        card.addEventListener("pointermove", (event) => {
-            if (
-                prefersReducedMotion ||
-                event.pointerType === "touch"
-            ) {
-                return;
-            }
+    .modal-content h3 {
+        padding: 0 10px 8px;
+        font-size: 20px;
+    }
 
-            let rect = cardRects.get(card);
-
-            if (!rect) {
-                rect = card.getBoundingClientRect();
-                cardRects.set(card, rect);
-            }
-
-            const mouseX = event.clientX - rect.left;
-            const mouseY = event.clientY - rect.top;
-
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            const rotateY =
-                ((mouseX - centerX) / centerX) * 16;
-
-            const rotateX =
-                ((centerY - mouseY) / centerY) * 16;
-
-            card.style.transition = "transform 0.08s linear";
-            card.style.zIndex = "10";
-
-            card.style.setProperty(
-                "--rotate-x",
-                `${rotateX}deg`
-            );
-
-            card.style.setProperty(
-                "--rotate-y",
-                `${rotateY}deg`
-            );
-
-            card.style.setProperty("--move-y", "-7px");
-            card.style.setProperty("--card-scale", "1.03");
-
-            card.style.setProperty(
-                "--mouse-x",
-                `${mouseX}px`
-            );
-
-            card.style.setProperty(
-                "--mouse-y",
-                `${mouseY}px`
-            );
-        });
+    .modal-close {
+        top: 20px;
+        right: 20px;
+    }
+}
 
 
-        /* Возвращаем карточку назад */
+/* =========================
+   ОТКЛЮЧЕНИЕ АНИМАЦИЙ
+========================= */
 
-        card.addEventListener("pointerleave", () => {
-            resetCard(card);
-        });
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
 
-
-        /* Открытие мышкой */
-
-        card.addEventListener("click", () => {
-            openModal(card);
-        });
-
-
-        /* Открытие клавиатурой */
-
-        card.addEventListener("keydown", (event) => {
-            if (
-                event.key === "Enter" ||
-                event.key === " "
-            ) {
-                event.preventDefault();
-                openModal(card);
-            }
-        });
-    });
-
-
-    /* Закрытие модального окна */
-
-    closeButton?.addEventListener("click", closeModal);
-    modalOverlay?.addEventListener("click", closeModal);
-
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-            closeModal();
-        }
-    });
-});
+    .project-card,
+    .project-card::before,
+    .project-card img,
+    .button,
+    .navigation a,
+    .footer a,
+    .modal,
+    .modal-content,
+    .modal-close {
+        transition: none;
+    }
+}

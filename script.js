@@ -1,246 +1,202 @@
-<!DOCTYPE html>
-<html lang="ru">
+document.addEventListener("DOMContentLoaded", () => {
+    const cards = document.querySelectorAll(".project-card");
 
-<head>
-    <meta charset="UTF-8">
+    const modal = document.querySelector("#project-modal");
+    const modalImage = document.querySelector("#modal-image");
+    const modalTitle = document.querySelector("#modal-title");
+    const closeButton = document.querySelector(".modal-close");
+    const modalOverlay = document.querySelector("[data-close-modal]");
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    const cardRects = new WeakMap();
 
-    <meta
-        name="description"
-        content="Портфолио Дениса — дизайн премиальной упаковки, рекламная графика и подготовка макетов к производству."
-    >
+    const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-    <title>Денис — дизайнер упаковки</title>
+    let previousFocusedElement = null;
 
-    <link rel="stylesheet" href="style.css">
-</head>
 
-<body id="top">
+    /* Возвращаем карточку в исходное положение */
 
-    <!-- Шапка сайта -->
+    function resetCard(card) {
+        card.style.transition = "transform 0.35s ease";
 
-    <header class="header">
-        <a
-            href="#top"
-            class="logo"
-            aria-label="Вернуться наверх"
-        >
-            DENIS.
-        </a>
+        card.style.setProperty("--rotate-x", "0deg");
+        card.style.setProperty("--rotate-y", "0deg");
+        card.style.setProperty("--move-y", "0px");
+        card.style.setProperty("--card-scale", "1");
 
-        <nav
-            class="navigation"
-            aria-label="Основная навигация"
-        >
-            <a href="#about">Обо мне</a>
-            <a href="#projects">Проекты</a>
-            <a href="#contacts">Контакты</a>
-        </nav>
-    </header>
+        card.style.zIndex = "1";
 
+        cardRects.delete(card);
+    }
 
-    <main>
 
-        <!-- Главный экран -->
+    /* Открываем увеличенное изображение */
 
-        <section class="hero">
-            <p class="subtitle">
-                Дизайнер упаковки и графики
-            </p>
+    function openModal(card) {
+        if (!modal || !modalImage || !modalTitle) {
+            return;
+        }
 
-            <h1>
-                Денис — дизайнер<br>
-                премиальной упаковки
-            </h1>
+        const image = card.querySelector("img");
+        const title = card.querySelector("h3");
 
-            <p class="description">
-                Разрабатываю упаковку, рекламную графику,
-                визуальные концепции и макеты для производства.
-            </p>
+        if (!image || !title) {
+            return;
+        }
 
-            <a href="#projects" class="button">
-                Смотреть работы
-            </a>
-        </section>
+        previousFocusedElement = document.activeElement;
 
+        modalImage.src = image.currentSrc || image.src;
+        modalImage.alt = image.alt;
+        modalTitle.textContent = title.textContent.trim();
 
-        <!-- Обо мне -->
+        modal.classList.add("open");
+        modal.setAttribute("aria-hidden", "false");
 
-        <section class="about" id="about">
-            <h2>Обо мне</h2>
+        document.body.classList.add("modal-open");
 
-            <p>
-                Работаю с CorelDRAW и Photoshop, создаю дизайн
-                премиальной упаковки, подготавливаю макеты к печати
-                и экспериментирую с нейросетями.
-            </p>
-        </section>
+        closeButton?.focus();
+    }
 
 
-        <!-- Проекты -->
+    /* Закрываем увеличенное изображение */
 
-        <section class="projects" id="projects">
-            <h2>Избранные проекты</h2>
+    function closeModal() {
+        if (!modal || !modal.classList.contains("open")) {
+            return;
+        }
 
-            <div class="project-grid">
+        modal.classList.remove("open");
+        modal.setAttribute("aria-hidden", "true");
 
-                <article class="project-card">
-                    <img
-                        src="images/project.jpg"
-                        alt="Дизайн премиальной упаковки"
-                        loading="lazy"
-                        decoding="async"
-                    >
+        document.body.classList.remove("modal-open");
 
-                    <span>01</span>
+        modalImage?.removeAttribute("src");
 
-                    <h3>Премиальная упаковка</h3>
+        if (previousFocusedElement instanceof HTMLElement) {
+            previousFocusedElement.focus();
+        }
+    }
 
-                    <p>
-                        Дизайн и подготовка конструкции к производству.
-                    </p>
-                </article>
 
+    /* Настраиваем карточки */
 
-                <article class="project-card">
-                    <img
-                        src="images/project-2.jpg"
-                        alt="Эксклюзивная серия упаковки для парфюмерии"
-                        loading="lazy"
-                        decoding="async"
-                    >
+    cards.forEach((card) => {
+        const title = card.querySelector("h3");
 
-                    <span>02</span>
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
 
-                    <h3>Эксклюзивная серия</h3>
+        if (title) {
+            card.setAttribute(
+                "aria-label",
+                `Открыть проект: ${title.textContent.trim()}`
+            );
+        }
 
-                    <p>
-                        Иллюстрации и оформление в современном стиле.
-                    </p>
-                </article>
 
-
-                <article class="project-card">
-                    <img
-                        src="images/project-3.jpg"
-                        alt="Дизайн парфюмерной упаковки"
-                        loading="lazy"
-                        decoding="async"
-                    >
-
-                    <span>03</span>
-
-                    <h3>Парфюмерная упаковка</h3>
-
-                    <p>
-                        Разработка дизайна премиальной серии.
-                    </p>
-                </article>
+        /* Запоминаем исходное положение карточки */
 
+        card.addEventListener("pointerenter", () => {
+            cardRects.set(card, card.getBoundingClientRect());
+        });
 
-                <article class="project-card">
-                    <img
-                        src="images/project-4.jpg"
-                        alt="Дизайн подарочной упаковки"
-                        loading="lazy"
-                        decoding="async"
-                    >
 
-                    <span>04</span>
+        /* Наклоняем карточку вслед за курсором */
 
-                    <h3>Подарочная серия</h3>
+        card.addEventListener("pointermove", (event) => {
+            if (
+                prefersReducedMotion ||
+                event.pointerType === "touch"
+            ) {
+                return;
+            }
 
-                    <p>
-                        Концепция и оформление подарочной упаковки.
-                    </p>
-                </article>
+            let rect = cardRects.get(card);
 
+            if (!rect) {
+                rect = card.getBoundingClientRect();
+                cardRects.set(card, rect);
+            }
 
-                <article class="project-card">
-                    <img
-                        src="images/project-5.jpg"
-                        alt="Пример рекламной графики"
-                        loading="lazy"
-                        decoding="async"
-                    >
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
 
-                    <span>05</span>
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
 
-                    <h3>Рекламная графика</h3>
+            const rotateY =
+                ((mouseX - centerX) / centerX) * 16;
 
-                    <p>
-                        Постеры, каталоги и изображения
-                        для социальных сетей.
-                    </p>
-                </article>
+            const rotateX =
+                ((centerY - mouseY) / centerY) * 16;
 
-            </div>
-        </section>
+            card.style.transition = "transform 0.08s linear";
+            card.style.zIndex = "10";
 
-    </main>
+            card.style.setProperty(
+                "--rotate-x",
+                `${rotateX}deg`
+            );
 
+            card.style.setProperty(
+                "--rotate-y",
+                `${rotateY}deg`
+            );
 
-    <!-- Подвал -->
+            card.style.setProperty("--move-y", "-7px");
+            card.style.setProperty("--card-scale", "1.03");
 
-    <footer class="footer" id="contacts">
-        <p>
-            © 2026 Денис. Дизайн и упаковка.
-        </p>
+            card.style.setProperty(
+                "--mouse-x",
+                `${mouseX}px`
+            );
 
-        <a
-            href="https://t.me/sambuca0"
-            target="_blank"
-            rel="noopener noreferrer"
-        >
-            Telegram
-        </a>
-    </footer>
+            card.style.setProperty(
+                "--mouse-y",
+                `${mouseY}px`
+            );
+        });
 
 
-    <!-- Окно просмотра проекта -->
+        /* Возвращаем карточку назад */
 
-    <div
-        class="modal"
-        id="project-modal"
-        aria-hidden="true"
-    >
-        <div
-            class="modal-overlay"
-            data-close-modal
-        ></div>
+        card.addEventListener("pointerleave", () => {
+            resetCard(card);
+        });
 
-        <div
-            class="modal-content"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
-            tabindex="-1"
-        >
-            <button
-                class="modal-close"
-                type="button"
-                aria-label="Закрыть окно просмотра"
-            >
-                ×
-            </button>
 
-            <img
-                id="modal-image"
-                alt=""
-            >
+        /* Открытие мышкой */
 
-            <h3 id="modal-title"></h3>
-        </div>
-    </div>
+        card.addEventListener("click", () => {
+            openModal(card);
+        });
 
 
-    <!-- Подключение JavaScript -->
+        /* Открытие клавиатурой */
 
-    <script src="script.js?v=7"></script>
+        card.addEventListener("keydown", (event) => {
+            if (
+                event.key === "Enter" ||
+                event.key === " "
+            ) {
+                event.preventDefault();
+                openModal(card);
+            }
+        });
+    });
 
-</body>
-</html>
+
+    /* Закрытие модального окна */
+
+    closeButton?.addEventListener("click", closeModal);
+    modalOverlay?.addEventListener("click", closeModal);
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeModal();
+        }
+    });
+});
