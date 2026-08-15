@@ -82,13 +82,22 @@
         muted
         loop
         playsinline
-        preload="metadata"
+        preload="auto"
+        poster="hero-poster.jpg"
         aria-hidden="true"
     >
         <source src="videos/hero.mp4" type="video/mp4">
     </video>
 
     <div class="hero-overlay"></div>
+
+    <button
+        class="hero-video-play"
+        type="button"
+        aria-label="Запустить фоновое видео"
+    >
+        ▶
+    </button>
 
     <div class="hero-content">
 
@@ -97,12 +106,12 @@
         </p>
 
         <h1>
-            Денис — дизайнер<br>
+            дизайнер<br>
             премиальной упаковки
         </h1>
 
         <p class="description">
-            Разрабатываю упаковку, рекламную графику,
+            Разрабатываю упаковку,
             визуальные концепции и макеты для производства.
         </p>
 
@@ -283,6 +292,52 @@
         </div>
     </div>
 
+
+    <!-- Запуск фонового видео на мобильных устройствах -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const heroVideo = document.querySelector(".hero-video");
+            const playButton = document.querySelector(".hero-video-play");
+
+            if (!heroVideo) {
+                return;
+            }
+
+            heroVideo.muted = true;
+
+            const tryPlayHeroVideo = () => {
+                const playPromise = heroVideo.play();
+
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            playButton?.classList.remove("show");
+                        })
+                        .catch(() => {
+                            playButton?.classList.add("show");
+                        });
+                }
+            };
+
+            tryPlayHeroVideo();
+
+            playButton?.addEventListener("click", () => {
+                heroVideo.muted = true;
+                tryPlayHeroVideo();
+            });
+
+            document.addEventListener(
+                "touchstart",
+                () => {
+                    if (heroVideo.paused) {
+                        tryPlayHeroVideo();
+                    }
+                },
+                { once: true, passive: true }
+            );
+        });
+    </script>
 
     <!-- Подключение JavaScript -->
 
