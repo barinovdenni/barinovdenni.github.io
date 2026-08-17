@@ -1039,3 +1039,165 @@ body.modal-open {
         transition: none;
     }
 }
+/* =========================
+   ИНТЕРАКТИВНЫЙ HERO
+========================= */
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Видео */
+
+.hero-video {
+    transition: transform 0.15s ease-out;
+    will-change: transform;
+}
+
+/* Затемнение поверх видео */
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background:
+        radial-gradient(
+            circle 500px at var(--cursor-x, 50%) var(--cursor-y, 50%),
+            rgba(32, 216, 132, 0.14),
+            transparent 65%
+        ),
+        linear-gradient(
+            90deg,
+            rgba(5, 9, 15, 0.72),
+            rgba(5, 15, 12, 0.35),
+            rgba(5, 9, 15, 0.65)
+        );
+
+    pointer-events: none;
+}
+
+/* Контент hero */
+
+.hero > * {
+    position: relative;
+    z-index: 3;
+
+    transform:
+        translate3d(
+            var(--content-x, 0px),
+            var(--content-y, 0px),
+            0
+        );
+
+    transition: transform 0.18s ease-out;
+    will-change: transform;
+}
+
+/* Маленький интерактивный блик */
+
+.hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 350px;
+    height: 350px;
+
+    left: var(--cursor-x, 50%);
+    top: var(--cursor-y, 50%);
+
+    transform: translate(-50%, -50%);
+
+    background: radial-gradient(
+        circle,
+        rgba(134, 247, 189, 0.12),
+        transparent 65%
+    );
+
+    filter: blur(20px);
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    transition:
+        left 0.12s ease-out,
+        top 0.12s ease-out;
+}
+
+
+/* =========================
+   ИНТЕРАКТИВНАЯ КНОПКА
+========================= */
+
+.hero .button {
+    position: relative;
+
+    transform:
+        translate(
+            var(--button-x, 0px),
+            var(--button-y, 0px)
+        );
+
+    transition:
+        transform 0.12s ease-out,
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.hero .button:hover {
+    box-shadow:
+        0 15px 40px rgba(32, 216, 132, 0.25);
+}
+
+
+/* =========================
+   МОБИЛЬНЫЕ УСТРОЙСТВА
+========================= */
+
+@media (max-width: 700px) {
+
+    .hero-video {
+        transform:
+            scale(1.08)
+            translate3d(
+                var(--video-x, 0px),
+                var(--video-y, 0px),
+                0
+            );
+    }
+
+    .hero::before {
+        width: 280px;
+        height: 280px;
+    }
+
+    .hero > * {
+        transform:
+            translate3d(
+                var(--content-x, 0px),
+                var(--content-y, 0px),
+                0
+            );
+    }
+}
+
+
+/* =========================
+   ЕСЛИ ПОЛЬЗОВАТЕЛЬ
+   ПРОСИТ УМЕНЬШИТЬ АНИМАЦИИ
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .hero-video,
+    .hero > *,
+    .hero .button,
+    .hero::before {
+        transition: none;
+    }
+}
