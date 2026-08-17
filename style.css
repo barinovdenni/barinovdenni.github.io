@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
 /* =========================
    БАЗОВЫЕ НАСТРОЙКИ
 ========================= */
@@ -66,7 +68,11 @@ body {
 
     color: var(--text);
 
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "Manrope", Arial, Helvetica, sans-serif;
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     line-height: 1.5;
 }
 
@@ -138,9 +144,10 @@ button {
 .logo {
     color: var(--text);
 
-    font-size: 24px;
+    font-size: 23px;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 0.04em;
+    line-height: 1;
 
     transition:
         color 0.3s ease,
@@ -239,6 +246,9 @@ button {
 ========================= */
 
 .hero-video {
+    --video-x: 0px;
+    --video-y: 0px;
+
     position: absolute;
     inset: 0;
     z-index: 0;
@@ -246,16 +256,13 @@ button {
     width: 100%;
     height: 100%;
 
-    display: block;
-
     object-fit: cover;
-    object-position: center center;
 
-    background:
-        url("hero-poster.jpg") center / cover no-repeat;
+    transform:
+        translate3d(var(--video-x, 0px), var(--video-y, 0px), 0)
+        scale(1.035);
 
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    will-change: transform;
 
     pointer-events: none;
 }
@@ -280,7 +287,7 @@ button {
 }
 
 
-/* Кнопка запуска видео, если автозапуск заблокирован */
+/* Кнопка запуска видео */
 
 .hero-video-play {
     position: absolute;
@@ -295,7 +302,7 @@ button {
     align-items: center;
     justify-content: center;
 
-    padding-left: 3px;
+    padding: 0 0 0 3px;
 
     background: rgba(9, 13, 11, 0.78);
     color: var(--primary);
@@ -303,14 +310,39 @@ button {
     border: 1px solid var(--border-strong);
     border-radius: 50%;
 
+    font-size: 18px;
+    line-height: 1;
+
     cursor: pointer;
 
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+
+    transition:
+        transform 0.25s ease,
+        background-color 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
 .hero-video-play.show {
     display: flex;
+}
+
+.hero-video-play:hover {
+    background: var(--primary);
+    color: #07100b;
+
+    transform: scale(1.08);
+
+    box-shadow:
+        0 0 30px rgba(32, 216, 132, 0.25);
+}
+
+.hero-video-play:focus-visible {
+    outline: 3px solid var(--primary-light);
+    outline-offset: 4px;
 }
 
 
@@ -325,6 +357,15 @@ button {
 
     margin: 0 auto;
     padding: 120px 40px;
+
+    transform:
+        translate3d(
+            var(--content-x, 0px),
+            var(--content-y, 0px),
+            0
+        );
+
+    will-change: transform;
 }
 
 
@@ -370,8 +411,9 @@ button {
     color: var(--text);
 
     font-size: clamp(48px, 7vw, 96px);
-    line-height: 0.95;
-    letter-spacing: -3px;
+    font-weight: 800;
+    line-height: 0.94;
+    letter-spacing: -0.045em;
 
     text-wrap: balance;
 }
@@ -418,6 +460,18 @@ button {
 
     font-weight: 800;
 
+    --button-x: 0px;
+    --button-y: 0px;
+
+    transform:
+        translate3d(
+            var(--button-x),
+            var(--button-y),
+            0
+        );
+
+    will-change: transform;
+
     box-shadow:
         0 10px 28px rgba(32, 216, 132, 0.12);
 
@@ -450,7 +504,13 @@ button {
 }
 
 .button:hover {
-    transform: translateY(-5px) scale(1.02);
+    transform:
+        translate3d(
+            var(--button-x),
+            calc(var(--button-y) - 5px),
+            0
+        )
+        scale(1.02);
 
     box-shadow:
         0 16px 40px rgba(32, 216, 132, 0.24),
@@ -464,7 +524,13 @@ button {
 }
 
 .button:active {
-    transform: translateY(-2px) scale(0.99);
+    transform:
+        translate3d(
+            var(--button-x),
+            calc(var(--button-y) - 2px),
+            0
+        )
+        scale(0.99);
 }
 
 .button:focus-visible {
@@ -940,29 +1006,23 @@ body.modal-open {
     }
 
     .hero-video {
-        width: 100%;
-        height: 100%;
-        object-position: center center;
-    }
-
-    .hero-video-play {
-        right: 18px;
-        bottom: 18px;
+        transform: scale(1.01);
     }
 
     .hero-overlay {
         background:
             linear-gradient(
                 180deg,
-                rgba(9, 13, 11, 0.28) 0%,
-                rgba(9, 13, 11, 0.52) 45%,
-                rgba(9, 13, 11, 0.82) 100%
+                rgba(9, 13, 11, 0.38) 0%,
+                rgba(9, 13, 11, 0.68) 45%,
+                rgba(9, 13, 11, 0.96) 100%
             );
     }
 
     .hero h1 {
         font-size: 48px;
-        letter-spacing: -2px;
+        font-weight: 800;
+        letter-spacing: -0.045em;
     }
 
     .description {
@@ -1036,168 +1096,6 @@ body.modal-open {
     .modal,
     .modal-content,
     .modal-close {
-        transition: none;
-    }
-}
-/* =========================
-   ИНТЕРАКТИВНЫЙ HERO
-========================= */
-
-.hero {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-}
-
-/* Видео */
-
-.hero-video {
-    transition: transform 0.15s ease-out;
-    will-change: transform;
-}
-
-/* Затемнение поверх видео */
-
-.hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-
-    background:
-        radial-gradient(
-            circle 500px at var(--cursor-x, 50%) var(--cursor-y, 50%),
-            rgba(32, 216, 132, 0.14),
-            transparent 65%
-        ),
-        linear-gradient(
-            90deg,
-            rgba(5, 9, 15, 0.72),
-            rgba(5, 15, 12, 0.35),
-            rgba(5, 9, 15, 0.65)
-        );
-
-    pointer-events: none;
-}
-
-/* Контент hero */
-
-.hero > * {
-    position: relative;
-    z-index: 3;
-
-    transform:
-        translate3d(
-            var(--content-x, 0px),
-            var(--content-y, 0px),
-            0
-        );
-
-    transition: transform 0.18s ease-out;
-    will-change: transform;
-}
-
-/* Маленький интерактивный блик */
-
-.hero::before {
-    content: "";
-
-    position: absolute;
-
-    width: 350px;
-    height: 350px;
-
-    left: var(--cursor-x, 50%);
-    top: var(--cursor-y, 50%);
-
-    transform: translate(-50%, -50%);
-
-    background: radial-gradient(
-        circle,
-        rgba(134, 247, 189, 0.12),
-        transparent 65%
-    );
-
-    filter: blur(20px);
-
-    z-index: 1;
-
-    pointer-events: none;
-
-    transition:
-        left 0.12s ease-out,
-        top 0.12s ease-out;
-}
-
-
-/* =========================
-   ИНТЕРАКТИВНАЯ КНОПКА
-========================= */
-
-.hero .button {
-    position: relative;
-
-    transform:
-        translate(
-            var(--button-x, 0px),
-            var(--button-y, 0px)
-        );
-
-    transition:
-        transform 0.12s ease-out,
-        background-color 0.3s ease,
-        box-shadow 0.3s ease;
-}
-
-.hero .button:hover {
-    box-shadow:
-        0 15px 40px rgba(32, 216, 132, 0.25);
-}
-
-
-/* =========================
-   МОБИЛЬНЫЕ УСТРОЙСТВА
-========================= */
-
-@media (max-width: 700px) {
-
-    .hero-video {
-        transform:
-            scale(1.08)
-            translate3d(
-                var(--video-x, 0px),
-                var(--video-y, 0px),
-                0
-            );
-    }
-
-    .hero::before {
-        width: 280px;
-        height: 280px;
-    }
-
-    .hero > * {
-        transform:
-            translate3d(
-                var(--content-x, 0px),
-                var(--content-y, 0px),
-                0
-            );
-    }
-}
-
-
-/* =========================
-   ЕСЛИ ПОЛЬЗОВАТЕЛЬ
-   ПРОСИТ УМЕНЬШИТЬ АНИМАЦИИ
-========================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-    .hero-video,
-    .hero > *,
-    .hero .button,
-    .hero::before {
         transition: none;
     }
 }
