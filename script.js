@@ -200,3 +200,169 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+/* =========================
+   ИНТЕРАКТИВНЫЙ HERO
+========================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const hero = document.querySelector(".hero");
+
+    if (!hero) {
+        return;
+    }
+
+    const video = hero.querySelector(".hero-video");
+    const button = hero.querySelector(".button");
+
+    let targetX = 50;
+    let targetY = 50;
+
+    let currentX = 50;
+    let currentY = 50;
+
+    let animationFrame = null;
+
+
+    function updateHero(x, y) {
+
+        targetX = x;
+        targetY = y;
+
+        hero.style.setProperty(
+            "--cursor-x",
+            `${x}%`
+        );
+
+        hero.style.setProperty(
+            "--cursor-y",
+            `${y}%`
+        );
+    }
+
+
+    function animate() {
+
+        currentX += (targetX - currentX) * 0.08;
+        currentY += (targetY - currentY) * 0.08;
+
+        const moveX =
+            (currentX - 50) * 0.18;
+
+        const moveY =
+            (currentY - 50) * 0.12;
+
+
+        /* Видео */
+
+        if (video) {
+
+            video.style.setProperty(
+                "--video-x",
+                `${moveX}px`
+            );
+
+            video.style.setProperty(
+                "--video-y",
+                `${moveY}px`
+            );
+        }
+
+
+        /* Контент */
+
+        hero.style.setProperty(
+            "--content-x",
+            `${-moveX * 0.35}px`
+        );
+
+        hero.style.setProperty(
+            "--content-y",
+            `${-moveY * 0.35}px`
+        );
+
+
+        /* Кнопка */
+
+        if (button) {
+
+            button.style.setProperty(
+                "--button-x",
+                `${moveX * 0.18}px`
+            );
+
+            button.style.setProperty(
+                "--button-y",
+                `${moveY * 0.18}px`
+            );
+        }
+
+
+        animationFrame =
+            requestAnimationFrame(animate);
+    }
+
+
+    /* Мышь */
+
+    hero.addEventListener("mousemove", (event) => {
+
+        const rect =
+            hero.getBoundingClientRect();
+
+        const x =
+            ((event.clientX - rect.left) /
+                rect.width) * 100;
+
+        const y =
+            ((event.clientY - rect.top) /
+                rect.height) * 100;
+
+        updateHero(x, y);
+    });
+
+
+    /* Телефон */
+
+    hero.addEventListener(
+        "touchmove",
+        (event) => {
+
+            if (!event.touches.length) {
+                return;
+            }
+
+            const touch =
+                event.touches[0];
+
+            const rect =
+                hero.getBoundingClientRect();
+
+            const x =
+                ((touch.clientX - rect.left) /
+                    rect.width) * 100;
+
+            const y =
+                ((touch.clientY - rect.top) /
+                    rect.height) * 100;
+
+            updateHero(x, y);
+        },
+        { passive: true }
+    );
+
+
+    /* Возврат в центр */
+
+    hero.addEventListener("mouseleave", () => {
+        updateHero(50, 50);
+    });
+
+
+    hero.addEventListener("touchend", () => {
+        updateHero(50, 50);
+    });
+
+
+    animate();
+});
